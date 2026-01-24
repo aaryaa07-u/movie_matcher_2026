@@ -1,0 +1,10 @@
+{
+    "aaryaa.awasthi@icloud.com": {
+        "password": "scrypt:32768:8:1$e55XFPV6sq4JAJKF$46a9fb245e41962d81caba1700c4f347c6733ab06bc28ef40cdb4767c9dccef501cd2e084a1e51c16042bb480f00c53a21d6ba04a7982c8f5934a90301dabae9",
+        "email": "aaryaa.awasthi@icloud.com"
+    },
+    "aaryaa.awasthi@hotmail.com": {
+        "password": "scrypt:32768:8:1$oSLZP1mDv9nnhvRj$bfb6e8235dd4037f8b12056befc457e18b4e12fb0f12a22292ae2712017a6c0b1a984c349a99bda327967914880aff9ebe6c1001f00cf36be58daf49d207f885",
+        "email": "aaryaa.awasthi@hotmail.com"
+    }
+}
