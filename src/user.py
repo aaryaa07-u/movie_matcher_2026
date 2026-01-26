@@ -6,7 +6,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 class User:
     """User class for authentication and registration management."""
     
-    USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'users.json')
+    USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
     
     def __init__(self, email, password=None):
         """Initialize a User instance."""
@@ -80,7 +80,7 @@ class User:
         users = User.load_users()
         
         if email not in users:
-            return False, "Email not found."
+            return False, "Invalid username/password."
         
         stored_password_hash = users[email]['password']
         

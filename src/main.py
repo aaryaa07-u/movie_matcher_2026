@@ -50,6 +50,7 @@ def register():
             flash(message, 'error')
 
     return render_template("register.html", email=email)
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -145,8 +146,8 @@ def search():
     # Sort results by weighted rating (rating adjusted by vote count)
     # This prevents high-rated movies with few votes from ranking above well-voted movies
     def weighted_rating(m):
-        rating = m.get('rating', 0)
-        votes = m.get('votes', 0)
+        rating = m.get('rating') or 0 
+        votes = m.get('votes') or 0
         # Weighted formula: higher votes increase confidence in the rating
         # Uses (votes / votes + 5000) * rating to balance rating and vote count
         return (votes / (votes + 5000)) * rating
