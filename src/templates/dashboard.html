@@ -13,6 +13,44 @@
             </div>
         </div>
     </div>
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Advanced Search</h5>
+                </div>
+                <div class="card-body">                    
+                    <h6>Popular Genres:</h6>
+                    {% for genre in genres[:10] %}
+                        <a href="{{ url_for('search', genre=genre) }}" class="badge bg-primary me-1">{{ genre }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Your Movie Recommendations</h5>
+                    </div>
+                <div class="card-body">
+                    <p class="card-text">Based on your preferences, here are some movies we think you'll enjoy.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="list-group mt-3">
+                {% for movie in recommendations %}
+                    <a href="{{ movie.link }}" class="list-group-item list-group-item-action" target="_blank">
+                        <h5 class="mb-1">{{ movie.title }}</h5>
+                        <p class="mb-1">{{ movie.description }}</p> 
+                        <small>Rating: {{ movie.rating }}</small>
+                    </a>
+                {% else %}
+                    <p class="text-muted">No recommendations available at the moment. Please check back later!</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
 </div>
 
 {% endblock %}

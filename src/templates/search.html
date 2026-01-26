@@ -1,0 +1,100 @@
+{% extends "common.html" %}
+{% block content %}
+<div class="container mt-3">
+    <div class="row">
+        <div class="col-12">
+            <h4>Advanced Movie Search</h4>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <!-- Search Filters Column -->
+        <div class="col-12 col-lg-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Search Filters</h5>
+                </div>
+                <div class="card-body">
+                    <form method="GET" action="/search">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title</label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ title }}" placeholder="Enter movie title">
+                        </div>
+                        <div class="mb-3">
+                            <label for="genre" class="form-label">Genre</label>
+                            <select class="form-select" id="genre" name="genre">
+                                <option value="">-- Select Genre --</option>
+                                {% for gen in genres %}
+                                    <option value="{{ gen }}" {% if genre == gen %}selected{% endif %}>{{ gen }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="year" class="form-label">Year</label>
+                            <input type="number" class="form-control" id="year" name="year" value="{{ year }}" placeholder="Enter release year">
+                        </div>
+                        <div class="mb-3">
+                            <label for="rating" class="form-label">Minimum Rating</label>
+                            <input type="number" step="0.1" min="0" max="10" class="form-control" id="rating" name="rating" value="{{ rating }}" placeholder="Enter minimum rating (0-10)">
+                        </div>
+                        <div class="mb-3">
+                            <label for="cast" class="form-label">Cast</label>
+                            <input type="text" class="form-control" id="cast" name="cast" value="{{ cast }}" placeholder="Enter actor/actress name">
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Search</button>
+                        <a href="/search" class="btn btn-secondary w-100 mt-2">Clear Filters</a>
+                    </form>
+                    <div class="card-body">                    
+                        <h6>Popular Genres:</h6>
+                        {% for genre in genres[:10] %}
+                            <a href="{{ url_for('search', genre=genre) }}" class="badge bg-primary me-1">{{ genre }}</a>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Search Results Column -->
+        {% if results is defined and results|length > 0 %}
+        <div class="col-12 col-lg-8">
+            <h5 class="card-title">Search Results <span class="badge bg-info">{{ results|length }} found</span></h5>
+            <div class="row">
+                {% for movie in results %}
+                <div class="col-md-6 mb-3">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                            <h5 class="card-title">{{ movie.title }}</h5>
+                            <span class="badge bg-warning mb-2">Rating: {{ "%.1f"|format(movie.rating) }}/10</span>
+                            </div>
+                            <p class="card-text">
+                                <strong>Year:</strong> {{ movie.year }} <br>
+                                <strong> Genres:</strong> 
+                                {% for genre in movie.genres %}
+                                    <span class="badge bg-secondary">{{ genre }}</span>
+                                {% endfor %} <br>
+                                <strong> Runtime:</strong> {{ movie.runtime }} min <br>
+                                
+                            </p>
+                            <small class="text-muted"> {{ movie.votes }} votes</small>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 col-lg-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="card-title">Search Results</h5>
+                </div>
+                <div class="card-body">
+                    <p class="text-muted">Enter search criteria and click "Search" to view results.</p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}

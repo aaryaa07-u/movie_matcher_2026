@@ -66,7 +66,7 @@ class User:
         
         # Hash password and save user
         users = User.load_users()
-        hashed_password = generate_password_hash(password)
+        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
         users[email] = {
             'password': hashed_password,
             'email': email
