@@ -57,7 +57,6 @@ def dashboard():
     user_email = session['user_email']
     user = User.get_user(user_email)
     genres = Movies.get_cached_genres()
-    print (f"User {user.get_email()} has logged in. Displaying name: {user.get_display_name()}")
 
     user_reviews = user.load_user_reviews()
 

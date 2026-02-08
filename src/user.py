@@ -30,27 +30,26 @@ class User:
         # Load reviews.json
         if os.path.exists(User.REVIEWS_FILE):
             with open(User.REVIEWS_FILE, 'r') as f:
-                reviews_data = json.load(f)
+                my_reviews = json.load(f)
         else:
             return []
 
-        # Load movies.json
-        movies_data = Movies.load_movies()
+        # Load movies
         user_reviews = []
 
         # Loop through movie IDs in reviews.json
-        for movie_id, users in reviews_data.items():
+        for movie_id, users in my_reviews.items():
             if self.__email in users:
-                user_review = users[self.__email]
-                movie = movies_data.get(movie_id, {})
+                my_review = users[self.__email]
+                movie = Movies.get_movie_by_id(movie_id)
                 user_reviews.append({
                     'movie': movie,
-                    'recommendation_score': user_review['recommendation_score'],
-                    'acting_score': user_review['acting_score'],
-                    'quality_score': user_review['quality_score'],
-                    'rewatch_score': user_review['rewatch_score'],
-                    'engagement': user_review['engagement'],
-                    'written_review': user_review['written_review']
+                    'recommendation_score': my_review['recommendation_score'],
+                    'acting_score': my_review['acting_score'],
+                    'quality_score': my_review['quality_score'],
+                    'rewatch_score': my_review['rewatch_score'],
+                    'engagement': my_review['engagement'],
+                    'written_review': my_review['written_review']
                 })
         return user_reviews
 
@@ -140,6 +139,7 @@ class User:
         users = User.load_users()
         if email in users:
             return User(email, users[email]['password'], users[email]['displayName'])
+    
 
     #creating my own hash function
     def __encrypt_password(password: str, email : str) -> str:

@@ -325,6 +325,15 @@ class Movies:
             return movies
 
         return []
+    
+    @staticmethod
+    def get_movie_by_id(movie_id):
+        """Get a movie by its ID."""
+        movies = Movies.get_cached_movies()
+        for movie in movies:
+            if movie.id == movie_id:
+                return movie
+        return None
 
     
     
