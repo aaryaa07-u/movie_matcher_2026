@@ -78,10 +78,14 @@
                             <small class="text-muted"> {{ movie.votes }} votes</small>
                         </div>
                         <!-- Review Button -->
-                        <button onclick='openPopup({{ movie|tojson|safe }})'
-                            class="btn btn-sm btn-outline-primary mt-2">
+                        
+                        <div class ="card-footer" style="display: flex; justify-content: flex-end; gap: 4px ;background-color: transparent; border-top: none;">
+                        <button onclick='writeReview({{movie.to_json() | tojson | safe}})'
+                            class="btn btn-sm btn-primary mt-2">
                         Leave your Review
                     </button>
+                    
+                    </div>
 
                         
                     
@@ -111,12 +115,16 @@
 
 <!--JavaScript to show popup -->
 <script>
-    function openPopup(Movie) {
-        document.getElementById('movieId').value = Movie.id;
+    function writeReview(movie) {
+        document.getElementById('movieId').value = movie.id;
+        document.getElementById('movieTitle').innerText = movie.title;
+
         document.getElementById('reviewModal').style.display = 'block';
         var reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
         reviewModal.show();
     }
+
+    
 </script>
 
 

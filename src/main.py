@@ -1,34 +1,14 @@
 from flask import Flask, flash, render_template, request, redirect, url_for, session
+import movies
 from user import User
 from review import Review
 from movies import Movies
 from auth import login_required
 from functools import lru_cache
 
+
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Change this to a random secret key
-
-# Cache for expensive operations
-_movies_cache = None
-_genres_cache = None
-_cache_version = 0
-
-def get_cached_movies():
-    """Get movies with caching."""
-    global _movies_cache, _cache_version
-    if _movies_cache is None:
-        print("Loading movies from disk...")
-        _movies_cache = Movies.load_movies()
-        _cache_version += 1
-    return _movies_cache
-
-def get_cached_genres():
-    """Get genres with caching."""
-    global _genres_cache
-    if _genres_cache is None:
-        print("Loading genres...")
-        _genres_cache = Movies.get_genres()
-    return _genres_cache
 
 @app.route('/')
 def home():
@@ -41,8 +21,9 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
+        display_name = request.form.get('displayName')
         
-        success, message = User.create_user(email, password, confirm_password)
+        success, message = User.create_user(email, display_namepassword, confirm_password)
         
         if success:
             flash(message, 'success')
@@ -73,9 +54,20 @@ def login():
 @app.route('/dashboard')
 @login_required
 def dashboard():
-    user = User.get_user(session['user_email'])
-    genres = get_cached_genres()
-    return render_template("dashboard.html", user=user, genres=genres)
+    user_email = session['user_email']
+    user = User.get_user(user_email)
+    genres = Movies.get_cached_genres()
+    print (f"User {user.get_email()} has logged in. Displaying name: {user.get_display_name()}")
+
+    user_reviews = user.load_user_reviews()
+
+    return render_template(
+        "dashboard.html",
+        user=user,
+        genres=genres,
+        user_reviews=user_reviews
+    )
+
 
 @app.route('/logout')
 def logout():
@@ -128,29 +120,29 @@ def search():
     print(f"Search filters - Title: {title}, Genre: {genre}, Year: {year}, Cast: {cast}, Rating: {rating}")
     
     # Use cached movies instead of loading from disk
-    movies = get_cached_movies()
-    genres = get_cached_genres()
+    movies = Movies.get_cached_movies()
+    genres = Movies.get_cached_genres()
     results = []
     
     # Limit results to 500 for performance
     MAX_RESULTS = 500
     
     # Filter movies based on all parameters
-    for movie_id, movie in movies.items():
+    for movie in movies:
         try:
             # Title filter
-            if title and title not in movie.get('title', '').lower():
+            if title and title not in movie.title.lower():
                 continue
             
             # Genre filter
-            if genre and genre not in movie.get('genres', []):
+            if genre and genre not in movie.genres:
                 continue
             
             # Year filter
             if year:
                 try:
                     year_int = int(year)
-                    movie_year = movie.get('year')
+                    movie_year = movie.year
                     if movie_year != year_int:
                         continue
                 except (ValueError, TypeError):
@@ -160,7 +152,7 @@ def search():
             if rating:
                 try:
                     rating_float = float(rating)
-                    movie_rating = movie.get('rating')
+                    movie_rating = movie.rating
                     if movie_rating is None or movie_rating < rating_float:
                         continue
                 except (ValueError, TypeError):
@@ -168,20 +160,20 @@ def search():
             
             # Cast filter (if available)
             if cast and 'cast' in movie:
-                if cast not in movie.get('cast', '').lower():
+                if cast not in movie.cast.lower():
                     continue
             
             # Movie passed all filters
             results.append(movie)
         except Exception as e:
-            print(f"Error filtering movie {movie_id}: {e}")
+            print(f"Error filtering movie {movie.id}: {e}")
             continue
     
     # Sort results by weighted rating (rating adjusted by vote count)
     # This prevents high-rated movies with few votes from ranking above well-voted movies
     def weighted_rating(m):
-        rating = m.get('rating') or 0 
-        votes = m.get('votes') or 0
+        rating = m.rating or 0 
+        votes = m.votes or 0
         # Weighted formula: higher votes increase confidence in the rating
         # Uses (votes / votes + 5000) * rating to balance rating and vote count
         return (votes / (votes + 5000)) * rating

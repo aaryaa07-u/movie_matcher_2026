@@ -4,16 +4,74 @@ import gzip
 import csv
 
 
+
 class Movies:
     """FileDB class for handling file-based database operations."""
-    MOVIES_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'movies.json')
+    MOVIES_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'movies.json') 
 
-    def __init__(self, data_dir="data"):
-        """Initialize the FileDB with the given file path."""
-        self.data_dir = data_dir
-        self.imdb_dir = os.path.join(self.data_dir, "imdb")
-        os.makedirs(self.data_dir, exist_ok=True)
-        os.makedirs(self.imdb_dir, exist_ok=True)        
+    # Cache for expensive operations
+    _movies_cache = None
+    _genres_cache = None
+    _cache_version = 0
+
+    "-""Initialize the FileDB with the given file path."""
+    __data_dir = 'data'
+    __imdb_dir = os.path.join(__data_dir, "imdb")
+    os.makedirs(__data_dir, exist_ok=True)
+    os.makedirs(__imdb_dir, exist_ok=True)   
+
+    def __init__(self, movie_id, title, year, genres, runtime, rating, votes):
+        self.id = movie_id
+        self.title = title
+        self.year = year
+        self.genres = genres
+        self.runtime = runtime
+        self.rating = rating
+        self.votes = votes
+         
+        
+
+
+    @staticmethod
+    def from_json(movie_id, data):
+        return Movies(
+            movie_id=movie_id,
+            title=data.get("title"),
+            year=data.get("year"),
+            genres=data.get("genres"),
+            runtime=data.get("runtime"),
+            rating=data.get("rating"),
+            votes=data.get("votes")
+        )
+
+    
+    def to_json(self):
+        return {
+            "id": self.id,
+            "title": self.title,
+            "year": self.year,
+            "genres": self.genres,
+            "runtime": self.runtime,
+            "rating": self.rating,
+            "votes": self.votes
+        }
+
+    @staticmethod
+    def get_cached_movies():
+        """Get movies with caching."""
+        if Movies._movies_cache is None:
+            print("Loading movies from disk...")
+            Movies._movies_cache = Movies.get_all_movies()
+            Movies._cache_version += 1
+        return Movies._movies_cache
+    
+    @staticmethod
+    def get_cached_genres():
+        """Get genres with caching."""
+        if Movies._genres_cache is None:
+            print("Loading genres...")
+            Movies._genres_cache = Movies.get_genres()
+        return Movies._genres_cache     
 
     def _process_imdb_data(self):
         """Process IMDb data files with ratings, cast, and proper filtering using csv.DictReader."""
@@ -238,33 +296,36 @@ class Movies:
         with open(Movies.MOVIES_FILE, 'w', encoding='utf-8') as f:
             json.dump(movies_dict, f, indent=4, ensure_ascii=False)
 
-    @staticmethod
-    def load_movies():
-        """Load all movies from the JSON file."""
-        if os.path.exists(Movies.MOVIES_FILE):
-            with open(Movies.MOVIES_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {}
     
     @staticmethod
     def get_genres():
         """Extract and return all unique genres from movies."""
-        movies = Movies.load_movies()
+        movies = Movies.get_all_movies()
         genres_set = set()
         
-        for movie_id, movie_data in movies.items():
-            if isinstance(movie_data, dict) and 'genres' in movie_data:
-                genres = movie_data['genres']
+        for movie in movies:
+            if movie.genres:
+                genres = movie.genres
                 if isinstance(genres, list):
                     genres_set.update(genres)
         
         return sorted(list(genres_set))
     
+    
     @staticmethod
     def get_all_movies():
-        """Get all movies from JSON file."""
         if os.path.exists(Movies.MOVIES_FILE):
             with open(Movies.MOVIES_FILE, 'r', encoding='utf-8') as f:
-                return json.load(f)
-        return {}
+                data = json.load(f)
+
+            movies = []
+            for movie_id, movie_data in data.items():
+                movies.append(Movies.from_json(movie_id, movie_data))
+
+            return movies
+
+        return []
+
+    
+    
 

@@ -1,19 +1,62 @@
 import json
 import os
+from movies import Movies
+
 
 class User:
     """User class for authentication and registration management."""
     
     USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
-    
-    def __init__(self, email, password=None):
+    REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
+    def __init__(self, email, password=None, display_name=None):
         """Initialize a User instance."""
-        self.email = email
-        self.password = password
-        self.id = None
+        print("Initializing User instance with email:", email)
+        self.__email = email
+        self.__password = password
+        self.__display_name = display_name
     
+
+    def get_email(self):
+        """Get the user's email.""" 
+        return self.__email
+    
+    def get_display_name(self):
+        """Get the user's display name."""
+        return self.__display_name
+
+#To display the user's own reviews on the dashboard
+    def load_user_reviews(self):
+
+        # Load reviews.json
+        if os.path.exists(User.REVIEWS_FILE):
+            with open(User.REVIEWS_FILE, 'r') as f:
+                reviews_data = json.load(f)
+        else:
+            return []
+
+        # Load movies.json
+        movies_data = Movies.load_movies()
+        user_reviews = []
+
+        # Loop through movie IDs in reviews.json
+        for movie_id, users in reviews_data.items():
+            if self.__email in users:
+                user_review = users[self.__email]
+                movie = movies_data.get(movie_id, {})
+                user_reviews.append({
+                    'movie': movie,
+                    'recommendation_score': user_review['recommendation_score'],
+                    'acting_score': user_review['acting_score'],
+                    'quality_score': user_review['quality_score'],
+                    'rewatch_score': user_review['rewatch_score'],
+                    'engagement': user_review['engagement'],
+                    'written_review': user_review['written_review']
+                })
+        return user_reviews
+
+
     @staticmethod
-    def password_check(password):
+    def validate_password(password):
         """Validate password strength."""
         if len(password) < 6:
             return False, "Password must be at least 6 characters."
@@ -47,7 +90,7 @@ class User:
         return email in users
     
     @staticmethod
-    def create_user(email, password, confirm_password):
+    def create_user(email, display_name, password, confirm_password):
         """Register a new user with validation."""
         # Check if email already exists
         if User.email_exists(email):
@@ -58,17 +101,18 @@ class User:
             return False, "Passwords do not match."
         
         # Validate password strength
-        is_valid, message = User.password_check(password)
+        is_valid, message = User.validate_password(password)
         if not is_valid:
             return False, message
         
         # Hash password and save user
         users = User.load_users()
-        hashed_password = encrypt_password(password, email)
+        hashed_password = User.__encrypt_password(password, email)
 
         users[email] = {
-            'password': encrypt_password(password, email),
-            'email': email
+            'password': hashed_password,
+            'email': email,
+            'displayName': display_name
         }
         User.save_users(users)
         return True, "User registered successfully."
@@ -83,8 +127,9 @@ class User:
         
         stored_password_hash = users[email]['password']
         
-        encrypt_password_hash = encrypt_password(password, email)
-        if encrypt_password_hash == stored_password_hash:
+        encrypted_password = User.__encrypt_password(password, email)
+
+        if encrypted_password == stored_password_hash:
             return True, "Login successful."
         else:
             return False, "Invalid username/password."
@@ -94,11 +139,10 @@ class User:
         """Get user data by email."""
         users = User.load_users()
         if email in users:
-            return users[email]
-        return None
+            return User(email, users[email]['password'], users[email]['displayName'])
 
-#creating my own hash function
-def encrypt_password(password: str, email : str) -> str:
+    #creating my own hash function
+    def __encrypt_password(password: str, email : str) -> str:
             data = (email + password + "moviematcher07").encode("utf-8")
             hash_value = 0
 
