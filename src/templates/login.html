@@ -1,5 +1,7 @@
 {% extends "common.html" %}
+<!--Inherit base layout from common.html-->
 {% block content %}
+<!-- Begin login page content block-->
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
@@ -9,6 +11,7 @@
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
                 {% for category, message in messages %}
+                    <!-- Display success or error alert based on flash message category -->
                     <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
                         {{ message }}
                         <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
@@ -18,18 +21,22 @@
         {% endwith %}
 
         <form method="POST" action="/login">
+            <!-- Login form sends POST request to /login route -->
 
             <div class="mb-3">
+                <!-- Email input field -->
                 <label for="email" class="form-label">Email address</label>
                 <input type="email" class="form-control" id="email" name="email" required>
             </div>
 
             <div class="mb-3">
+                <!-- Password input field -->
                 <label for="password" class="form-label">Password</label>
                 <input type="password" class="form-control" id="password" name="password" required>
             </div>
 
             <button type="submit" class="btn btn-primary w-100">
+                <!-- Submit button to login the user -->
                 Login
             </button>
 
@@ -39,6 +46,7 @@
             <small>
                 Don’t have an account?
                 <a href="/register">Create one</a>
+                <!-- Link to registration page -->
             </small>
         </div>
 
@@ -46,3 +54,4 @@
 </div>
 
 {% endblock %}
+<!--End login page content block-->

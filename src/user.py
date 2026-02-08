@@ -1,7 +1,5 @@
 import json
 import os
-from werkzeug.security import generate_password_hash, check_password_hash
-
 
 class User:
     """User class for authentication and registration management."""
@@ -66,9 +64,10 @@ class User:
         
         # Hash password and save user
         users = User.load_users()
-        hashed_password = generate_password_hash(password, method='pbkdf2:sha256')
+        hashed_password = encrypt_password(password, email)
+
         users[email] = {
-            'password': hashed_password,
+            'password': encrypt_password(password, email),
             'email': email
         }
         User.save_users(users)
@@ -84,7 +83,8 @@ class User:
         
         stored_password_hash = users[email]['password']
         
-        if check_password_hash(stored_password_hash, password):
+        encrypt_password_hash = encrypt_password(password, email)
+        if encrypt_password_hash == stored_password_hash:
             return True, "Login successful."
         else:
             return False, "Invalid username/password."
@@ -96,3 +96,13 @@ class User:
         if email in users:
             return users[email]
         return None
+
+#creating my own hash function
+def encrypt_password(password: str, email : str) -> str:
+            data = (email + password + "moviematcher07").encode("utf-8")
+            hash_value = 0
+
+            for byte in data:
+                hash_value = (hash_value * 131 + byte) % (2**64)
+
+            return hex(hash_value)[2:]

@@ -1,5 +1,6 @@
 from flask import Flask, flash, render_template, request, redirect, url_for, session
 from user import User
+from review import Review
 from movies import Movies
 from auth import login_required
 from functools import lru_cache
@@ -46,6 +47,7 @@ def register():
         if success:
             flash(message, 'success')
             return redirect(url_for('login'))
+
         else:
             flash(message, 'error')
 
@@ -80,6 +82,38 @@ def logout():
     session.clear()
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
+
+@app.route('/reviews', methods=['GET', 'POST'])
+@login_required
+def reviews():
+    if request.method == 'POST':
+        movie_id = request.form.get('movieId')
+        recommendation_score = int(request.form.get('recommend'))
+        acting_score = int(request.form.get('acting'))
+        quality_score = int(request.form.get('quality'))
+        rewatch_score = int(request.form.get('rewatch'))
+        engagement = int(request.form.get('engagement'))
+        written_review = request.form.get('reviewText')
+
+        success, message = Review.save_review(
+            user_email=session['user_email'],
+            movie_id=movie_id,
+            recommendation_score=recommendation_score,
+            acting_score=acting_score,
+            quality_score=quality_score,
+            rewatch_score=rewatch_score,
+            engagement=engagement,
+            written_review=written_review
+        )
+
+        if success:
+            flash(message, 'success')
+            return redirect(url_for('search'))
+        else:
+            flash(message, 'error')
+    return redirect(url_for('dashboard'))                   
+
+ 
 
 @app.route('/search')
 @login_required

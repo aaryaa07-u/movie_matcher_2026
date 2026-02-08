@@ -1,31 +1,55 @@
 {% extends "common.html" %}
 {% block content %}
- 
-    <div class="container">
-        <div class="row">
-            <div class="col text-center">
-                <h1>Welcome to Movie Matcher</h1>
-                <p>Stop scrolling. Start Watching.</p>
-                <div class="row">
-            <div class="col-md-6 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">New User?</h5>
-                        <p class="card-text">Create an account to start your movie matcher journey.</p>
-                        <a href="/register" class="btn btn-primary">Let's go</a>
+
+<div class="container mt-5">
+
+    <!-- Hero Section -->
+    <div class="text-center mb-5">
+        <h1 class="fw-bold">Welcome to <span class="text-primary">Movie Matcher</span></h1>
+        <p class="text-muted fs-5">Stop scrolling. Start watching.</p>
+    </div>
+
+    <!-- Cards Row -->
+    <div class="row justify-content-center">
+
+        <!-- New User Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <!-- Person-plus icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#0d6efd" viewBox="0 0 16 16">
+                            <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
+                            <path d="M14 14s-1-4-6-4-6 4-6 4 1 1 6 1 6-1 6-1"/>
+                            <path d="M13 5.5a.5.5 0 0 1-.5.5H11v1.5a.5.5 0 0 1-1 0V6h-1.5a.5.5 0 0 1 0-1H10V3.5a.5.5 0 0 1 1 0V5h1.5a.5.5 0 0 1 .5.5"/>
+                        </svg>
                     </div>
-                </div>
-            </div>
-            <div class="col-md-6 mb-3">
-                <div class="card h-100">
-                    <div class="card-body">
-                        <h5 class="card-title">Already a Member?</h5>
-                        <p class="card-text">Your recommendations are waiting for you.</p>
-                        <a href="/login" class="btn btn-success">Jump back in!</a>
-                    </div>
+                    <h4 class="card-title">New User?</h4>
+                    <p class="card-text text-muted">Create an account to start your Movie Matcher journey.</p>
+                    <a href="/register" class="btn btn-dark px-4 mt-2">Let's go</a>
                 </div>
             </div>
         </div>
+
+        <!-- Existing User Card -->
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-body text-center p-4">
+                    <div class="mb-3">
+                        <!-- Play icon -->
+                        <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#28a745" viewBox="0 0 16 16">
+                            <path d="M6.79 5.093A.5.5 0 0 1 7.5 5.5v5a.5.5 0 0 1-.79.407L3.5 8.972V7.028l3.29-1.935z"/>
+                            <path d="M0 4a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V4z"/>
+                        </svg>
+                    </div>
+                    <h4 class="card-title">Already a Member?</h4>
+                    <p class="card-text text-muted">Your recommendations are waiting for you.</p>
+                    <a href="/login" class="btn btn-success px-4 mt-2">Jump back in!</a>
+                </div>
+            </div>
+        </div>
+
     </div>
-      
-    {% endblock %}
+</div>
+
+{% endblock %}

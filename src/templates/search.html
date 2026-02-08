@@ -77,6 +77,14 @@
                             </p>
                             <small class="text-muted"> {{ movie.votes }} votes</small>
                         </div>
+                        <!-- Review Button -->
+                        <button onclick='openPopup({{ movie|tojson|safe }})'
+                            class="btn btn-sm btn-outline-primary mt-2">
+                        Leave your Review
+                    </button>
+
+                        
+                    
                     </div>
                 </div>
                 {% endfor %}
@@ -96,5 +104,20 @@
         {% endif %}
     </div>
 </div>
+
+{% include "review_modal.html" %}
+
+
+
+<!--JavaScript to show popup -->
+<script>
+    function openPopup(Movie) {
+        document.getElementById('movieId').value = Movie.id;
+        document.getElementById('reviewModal').style.display = 'block';
+        var reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
+        reviewModal.show();
+    }
+</script>
+
 
 {% endblock %}
