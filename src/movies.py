@@ -2,8 +2,8 @@ import json
 import os
 import gzip
 import csv
-
-
+from review import Review
+from user import User
 
 class Movies:
     """FileDB class for handling file-based database operations."""
@@ -335,6 +335,44 @@ class Movies:
                 return movie
         return None
 
+    
+    def get_reviews(self):
+            """Get reviews for this movie."""
+            movie_reviews = Review.get_reviews_for_movie(self.id)
+            reviews = []
+
+            print("Reviews for movie ID:", self.id, movie_reviews.items())
+            for user_email, review in movie_reviews.items():
+                preffered_name = User.get_user(user_email).get_display_name()
+
+                review["user_display_name"] = preffered_name
+                reviews.append(review)
+            print(reviews)
+
+            return reviews
+ 
+    #To display the user's own reviews on the dashboard
+    def get_user_reviews(user):
+
+        # Load reviews.json
+        user_reviews = user.load_user_reviews()
+        # Load movies
+        reviews = []
+
+        # Loop through movie IDs in reviews.json
+        for movie_id, review in user_reviews.items():
+            movie = Movies.get_movie_by_id(movie_id)
+            reviews.append({
+                'movie': movie,
+                'recommendation_score': review['recommendation_score'],
+                'acting_score': review['acting_score'],
+                'quality_score': review['quality_score'],
+                'rewatch_score': review['rewatch_score'],
+                'engagement': review['engagement'],
+                    'written_review': review['written_review']
+                })
+        return reviews
+ 
     
     
 

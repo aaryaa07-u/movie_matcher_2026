@@ -1,6 +1,5 @@
 import json
 import os
-from movies import Movies
 
 
 class User:
@@ -21,37 +20,9 @@ class User:
         return self.__email
     
     def get_display_name(self):
-        """Get the user's display name."""
+        """Get the user's display preferred name."""
         return self.__display_name
 
-#To display the user's own reviews on the dashboard
-    def load_user_reviews(self):
-
-        # Load reviews.json
-        if os.path.exists(User.REVIEWS_FILE):
-            with open(User.REVIEWS_FILE, 'r') as f:
-                my_reviews = json.load(f)
-        else:
-            return []
-
-        # Load movies
-        user_reviews = []
-
-        # Loop through movie IDs in reviews.json
-        for movie_id, users in my_reviews.items():
-            if self.__email in users:
-                my_review = users[self.__email]
-                movie = Movies.get_movie_by_id(movie_id)
-                user_reviews.append({
-                    'movie': movie,
-                    'recommendation_score': my_review['recommendation_score'],
-                    'acting_score': my_review['acting_score'],
-                    'quality_score': my_review['quality_score'],
-                    'rewatch_score': my_review['rewatch_score'],
-                    'engagement': my_review['engagement'],
-                    'written_review': my_review['written_review']
-                })
-        return user_reviews
 
 
     @staticmethod
@@ -112,6 +83,7 @@ class User:
             'password': hashed_password,
             'email': email,
             'displayName': display_name
+            
         }
         User.save_users(users)
         return True, "User registered successfully."
@@ -140,6 +112,17 @@ class User:
         if email in users:
             return User(email, users[email]['password'], users[email]['displayName'])
     
+    def load_user_reviews(self):
+        """Load reviews submitted by this user."""
+        if os.path.exists(User.REVIEWS_FILE):
+            with open(User.REVIEWS_FILE, 'r') as f:
+                reviews = json.load(f)
+                user_reviews = {}
+                for movie_id, movie_reviews in reviews.items():
+                    if self.__email in movie_reviews:
+                        user_reviews[movie_id] = movie_reviews[self.__email]
+                return user_reviews
+        return {}
 
     #creating my own hash function
     def __encrypt_password(password: str, email : str) -> str:

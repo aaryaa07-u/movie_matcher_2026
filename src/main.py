@@ -1,5 +1,4 @@
 from flask import Flask, flash, render_template, request, redirect, url_for, session
-import movies
 from user import User
 from review import Review
 from movies import Movies
@@ -21,9 +20,9 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        display_name = request.form.get('displayName')
+        display_Name = request.form.get('displayName')
         
-        success, message = User.create_user(email, display_namepassword, confirm_password)
+        success, message = User.create_user(email, display_Name, password, confirm_password)
         
         if success:
             flash(message, 'success')
@@ -58,7 +57,7 @@ def dashboard():
     user = User.get_user(user_email)
     genres = Movies.get_cached_genres()
 
-    user_reviews = user.load_user_reviews()
+    user_reviews = Movies.get_user_reviews(user)
 
     return render_template(
         "dashboard.html",
@@ -74,6 +73,7 @@ def logout():
     flash('You have been logged out.', 'success')
     return redirect(url_for('home'))
 
+
 @app.route('/reviews', methods=['GET', 'POST'])
 @login_required
 def reviews():
@@ -82,10 +82,13 @@ def reviews():
         recommendation_score = int(request.form.get('recommend'))
         acting_score = int(request.form.get('acting'))
         quality_score = int(request.form.get('quality'))
+        acting_score = int(request.form.get('acting'))
+        quality_score = int(request.form.get('quality'))
         rewatch_score = int(request.form.get('rewatch'))
-        engagement = int(request.form.get('engagement'))
+        engagement_score = int(request.form.get('engagement'))
         written_review = request.form.get('reviewText')
 
+        # Save review
         success, message = Review.save_review(
             user_email=session['user_email'],
             movie_id=movie_id,
@@ -93,8 +96,8 @@ def reviews():
             acting_score=acting_score,
             quality_score=quality_score,
             rewatch_score=rewatch_score,
-            engagement=engagement,
-            written_review=written_review
+            engagement=engagement_score,
+            written_review=written_review,
         )
 
         if success:
@@ -102,7 +105,10 @@ def reviews():
             return redirect(url_for('search'))
         else:
             flash(message, 'error')
-    return redirect(url_for('dashboard'))                   
+
+        
+
+                  
 
  
 
@@ -124,7 +130,8 @@ def search():
     results = []
     
     # Limit results to 500 for performance
-    MAX_RESULTS = 500
+    MAX_RESULTS = 50
+
     
     # Filter movies based on all parameters
     for movie in movies:

@@ -17,36 +17,40 @@
                     <form method="GET" action="/search">
                         <div class="mb-3">
                             <label for="title" class="form-label">Title</label>
-                            <input type="text" class="form-control" id="title" name="title" value="{{ title }}" placeholder="Enter movie title">
+                            <input type="text" class="form-control" id="title" name="title" value="{{ title }}"
+                                placeholder="Enter movie title">
                         </div>
                         <div class="mb-3">
                             <label for="genre" class="form-label">Genre</label>
                             <select class="form-select" id="genre" name="genre">
                                 <option value="">-- Select Genre --</option>
                                 {% for gen in genres %}
-                                    <option value="{{ gen }}" {% if genre == gen %}selected{% endif %}>{{ gen }}</option>
+                                <option value="{{ gen }}" {% if genre==gen %}selected{% endif %}>{{ gen }}</option>
                                 {% endfor %}
                             </select>
                         </div>
                         <div class="mb-3">
                             <label for="year" class="form-label">Year</label>
-                            <input type="number" class="form-control" id="year" name="year" value="{{ year }}" placeholder="Enter release year">
+                            <input type="number" class="form-control" id="year" name="year" value="{{ year }}"
+                                placeholder="Enter release year">
                         </div>
                         <div class="mb-3">
                             <label for="rating" class="form-label">Minimum Rating</label>
-                            <input type="number" step="0.1" min="0" max="10" class="form-control" id="rating" name="rating" value="{{ rating }}" placeholder="Enter minimum rating (0-10)">
+                            <input type="number" step="0.1" min="0" max="10" class="form-control" id="rating"
+                                name="rating" value="{{ rating }}" placeholder="Enter minimum rating (0-10)">
                         </div>
                         <div class="mb-3">
                             <label for="cast" class="form-label">Cast</label>
-                            <input type="text" class="form-control" id="cast" name="cast" value="{{ cast }}" placeholder="Enter actor/actress name">
+                            <input type="text" class="form-control" id="cast" name="cast" value="{{ cast }}"
+                                placeholder="Enter actor/actress name">
                         </div>
                         <button type="submit" class="btn btn-primary w-100">Search</button>
                         <a href="/search" class="btn btn-secondary w-100 mt-2">Clear Filters</a>
                     </form>
-                    <div class="card-body">                    
+                    <div class="card-body">
                         <h6>Popular Genres:</h6>
                         {% for genre in genres[:10] %}
-                            <a href="{{ url_for('search', genre=genre) }}" class="badge bg-primary me-1">{{ genre }}</a>
+                        <a href="{{ url_for('search', genre=genre) }}" class="badge bg-primary me-1">{{ genre }}</a>
                         {% endfor %}
                     </div>
                 </div>
@@ -63,32 +67,36 @@
                     <div class="card h-100 shadow-sm">
                         <div class="card-body">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                            <h5 class="card-title">{{ movie.title }}</h5>
-                            <span class="badge bg-warning mb-2">Rating: {{ "%.1f"|format(movie.rating or 0) }}/10</span>
+                                <h5 class="card-title">{{ movie.title }}</h5>
+                                <span class="badge bg-warning mb-2">Rating: {{ "%.1f"|format(movie.rating or 0)
+                                    }}/10</span>
                             </div>
                             <p class="card-text">
                                 <strong>Year:</strong> {{ movie.year }} <br>
-                                <strong> Genres:</strong> 
+                                <strong> Genres:</strong>
                                 {% for genre in movie.genres %}
-                                    <span class="badge bg-secondary">{{ genre }}</span>
+                                <span class="badge bg-secondary">{{ genre }}</span>
                                 {% endfor %} <br>
                                 <strong> Runtime:</strong> {{ movie.runtime }} min <br>
-                                
+
                             </p>
                             <small class="text-muted"> {{ movie.votes }} votes</small>
                         </div>
                         <!-- Review Button -->
-                        
-                        <div class ="card-footer" style="display: flex; justify-content: flex-end; gap: 4px ;background-color: transparent; border-top: none;">
-                        <button onclick='writeReview({{movie.to_json() | tojson | safe}})'
-                            class="btn btn-sm btn-primary mt-2">
-                        Leave your Review
-                    </button>
-                    
-                    </div>
 
-                        
-                    
+                        <div class="card-footer"
+                            style="display: flex; justify-content: flex-end; gap: 4px ;background-color: transparent; border-top: none;">
+                            <button onclick='writeReview({{movie.to_json() | tojson | safe}})'
+                                class="btn btn-sm btn-primary mt-2">
+                                Leave your Review
+                            </button>
+                            <button onclick='readReviews({{movie.to_json() | tojson | safe}},
+                            {{movie.get_reviews() | tojson | safe}})' class="btn btn-sm btn-outline-primary mt-2">
+                                Read Reviews
+                            </button>
+
+                        </div>
+
                     </div>
                 </div>
                 {% endfor %}
@@ -111,6 +119,7 @@
 
 {% include "review_modal.html" %}
 
+{% include "movieReviewsModal.html" %}
 
 
 <!--JavaScript to show popup -->
@@ -119,12 +128,41 @@
         document.getElementById('movieId').value = movie.id;
         document.getElementById('movieTitle').innerText = movie.title;
 
-        document.getElementById('reviewModal').style.display = 'block';
         var reviewModal = new bootstrap.Modal(document.getElementById('reviewModal'));
         reviewModal.show();
     }
 
-    
+
+    function readReviews(movie, reviews) {
+        console.log("Movie:", movie);
+        console.log("Reviews:", reviews);
+        renderReviewCards(movie, reviews);
+        var movieReviewsModal = new bootstrap.Modal(document.getElementById('movieReviewsModal'));
+        movieReviewsModal.show();
+    }
+
+    function renderReviewCards(movie, reviews = []) {
+        const container = document.getElementById("reviewCards");
+        container.innerHTML = `<h5>${movie.title}</h5>`;
+
+        reviews.forEach(r => {
+            container.innerHTML += `
+            <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <p class="mb-0"><strong>${r.user_display_name}'s Review:</strong></p>
+                <p class="mb-0">${r.written_review}</p>
+                <p class="text-muted mb-1">
+                <strong>Rating:</strong> ${r.rating.toFixed(1)}/10
+                </p>
+            </div>
+            </div>
+        `;
+        });
+
+    }
+
+
+
 </script>
 
 

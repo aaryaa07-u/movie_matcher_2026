@@ -3,9 +3,6 @@ import os
 
 class Review:
     REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
-    
-    
-       
 
     @staticmethod
     def save_review(user_email, movie_id, recommendation_score, acting_score,
@@ -18,8 +15,11 @@ class Review:
             "quality_score": quality_score,
             "rewatch_score": rewatch_score,
             "engagement": engagement,
+            #rating 
+            "rating": (recommendation_score + acting_score + quality_score + rewatch_score + engagement) / 10,
             "written_review": written_review
         }
+
         
         # Ensure file exists
         reviews_file = "data/reviews.json"
@@ -46,3 +46,19 @@ class Review:
             json.dump(reviews, f, indent=4)
 
         return True, "Review submitted successfully."
+    
+
+    @staticmethod
+    def get_reviews_for_movie(movie_id):
+        """Get all reviews for a specific movie."""
+        if os.path.exists(Review.REVIEWS_FILE):
+            with open(Review.REVIEWS_FILE, 'r') as f:
+                reviews = json.load(f)
+                movies_reviews = reviews.get(movie_id, {})
+               
+
+                print(movies_reviews)
+
+            return movies_reviews
+        return {}
+    
