@@ -3,18 +3,19 @@
 
 <div class="container d-flex justify-content-center align-items-center" style="min-height: 80vh;">
     <div class="card shadow-sm p-4" style="width: 100%; max-width: 420px;">
-        
+
         <h2 class="text-center mb-4">Create Account</h2>
 
         {% with messages = get_flashed_messages(with_categories=true) %}
-            {% if messages %}
-                {% for category, message in messages %}
-                    <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show" role="alert">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endif %}
+        {% if messages %}
+        {% for category, message in messages %}
+        <div class="alert alert-{{ 'success' if category == 'success' else 'danger' }} alert-dismissible fade show"
+            role="alert">
+            {{ message }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endfor %}
+        {% endif %}
         {% endwith %}
 
         <form method="POST" action="/register">
@@ -26,7 +27,8 @@
 
             <div class="mb-3">
                 <label for="displayName" class="form-label">Prefferred name</label>
-                <input type="text" class="form-control" id="displayName" name="displayName" value="{{ displayName }}" required>
+                <input type="text" class="form-control" id="displayName" name="displayName" value="{{ displayName }}"
+                    required>
             </div>
 
 
@@ -38,6 +40,17 @@
             <div class="mb-3">
                 <label for="confirm_password" class="form-label">Confirm Password</label>
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+
+            <div class="mb-3">
+                <label for="preferred_genres" class="form-label">Preferred genres:</label>
+                {% for genre in genres[:10] %}
+                <span class="form-check">
+                    <input class="form-check-input" type="checkbox" name="preferred_genres" value="{{ genre }}"
+                        id="genre_{{ loop.index }}">
+                    <label class="form-check-label" for="genre_{{ loop.index }}">{{ genre }}</label>
+                </span>
+                {% endfor %}
             </div>
 
             <button type="submit" class="btn btn-primary w-100">

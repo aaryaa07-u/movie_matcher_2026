@@ -55,6 +55,8 @@ class Movies:
             "rating": self.rating,
             "votes": self.votes
         }
+    
+    
 
     @staticmethod
     def get_cached_movies():
@@ -73,15 +75,16 @@ class Movies:
             Movies._genres_cache = Movies.get_genres()
         return Movies._genres_cache     
 
-    def _process_imdb_data(self):
+    def _process_imdb_data():
         """Process IMDb data files with ratings, cast, and proper filtering using csv.DictReader."""
         print("Processing IMDb data files...")
         
         # Define file paths
-        title_basics_file = os.path.join(self.imdb_dir, "title.basics.tsv.gz")
-        title_ratings_file = os.path.join(self.imdb_dir, "title.ratings.tsv.gz")
-        name_basics_file = os.path.join(self.imdb_dir, "name.basics.tsv.gz")
-        title_principals_file = os.path.join(self.imdb_dir, "title.principals.tsv.gz")
+        title_basics_file = os.path.join(Movies.__imdb_dir, "title.basics.tsv.gz")
+        title_ratings_file = os.path.join(Movies.__imdb_dir, "title.ratings.tsv.gz")
+        name_basics_file = os.path.join(Movies.__imdb_dir, "name.basics.tsv.gz")
+        title_principals_file = os.path.join(Movies.__imdb_dir, "title.principals.tsv.gz")
+        title_crew_file = os.path.join(Movies.__imdb_dir, "title.crew.tsv.gz")
         
         movies_data = {}
         
@@ -279,7 +282,7 @@ class Movies:
             
             # Step 6: Save to JSON
             print(f"Step 6: Saving {len(movies_data)} movies to JSON...")
-            self.save_movies(movies_data)
+            Movies.save_movies(movies_data)
             print(f"✓ Successfully processed {len(movies_data)} movies")
             return movies_data
             
@@ -311,6 +314,17 @@ class Movies:
         
         return sorted(list(genres_set))
     
+    @staticmethod
+    def search_movies_by_genre(genre):
+        """Get movies that belong to a specific genre."""
+        movies = Movies.get_all_movies()
+        genre_movies = []
+        
+        for movie in movies:
+            if movie.genres and genre in movie.genres:
+                genre_movies.append(movie)
+        
+        return genre_movies
     
     @staticmethod
     def get_all_movies():

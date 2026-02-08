@@ -1,5 +1,6 @@
 import json
 import os
+from user_preferences import UserPreferences
 
 
 class User:
@@ -7,12 +8,15 @@ class User:
     
     USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
     REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
-    def __init__(self, email, password=None, display_name=None):
+    def __init__(self, email, password=None, display_name=None, preferred_genres=None):
         """Initialize a User instance."""
         print("Initializing User instance with email:", email)
         self.__email = email
         self.__password = password
         self.__display_name = display_name
+        self.__preferences = UserPreferences()
+        if preferred_genres:
+          self.__preferences.new_user_genre_score(preferred_genres) 
     
 
     def get_email(self):
@@ -22,6 +26,10 @@ class User:
     def get_display_name(self):
         """Get the user's display preferred name."""
         return self.__display_name
+
+    def get_preferred_genres(self):
+        """Get the user's preferred genres."""
+        return self.__preferred_genres
 
 
 
@@ -59,8 +67,18 @@ class User:
         users = User.load_users()
         return email in users
     
+    def to_dict(self):
+        """Convert the User instance to a dictionary for JSON storage."""
+        return {
+            self.__email : {
+            "password": self.__password,
+            "displayName": self.__display_name,
+            "preferences": self.__preferences.to_dict()
+            }
+        }
+    
     @staticmethod
-    def create_user(email, display_name, password, confirm_password):
+    def create_user(email, display_name, password, confirm_password, preferred_genres):
         """Register a new user with validation."""
         # Check if email already exists
         if User.email_exists(email):
@@ -79,26 +97,25 @@ class User:
         users = User.load_users()
         hashed_password = User.__encrypt_password(password, email)
 
-        users[email] = {
-            'password': hashed_password,
-            'email': email,
-            'displayName': display_name
-            
-        }
-        User.save_users(users)
+        new_user = User(email, hashed_password, display_name, preferred_genres)
+
+        User.save_users(new_user.to_dict())
         return True, "User registered successfully."
     
     @staticmethod
     def authenticate_user(email, password):
         """Authenticate a user by email and password."""
         users = User.load_users()
+
         
         if email not in users:
             return False, "Invalid username/password."
         
         stored_password_hash = users[email]['password']
+        print("Stored password hash:", stored_password_hash)
         
         encrypted_password = User.__encrypt_password(password, email)
+        print("Encrypted password:", encrypted_password)
 
         if encrypted_password == stored_password_hash:
             return True, "Login successful."

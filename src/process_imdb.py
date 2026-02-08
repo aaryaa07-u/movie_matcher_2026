@@ -14,8 +14,7 @@ def main():
     print("This may take a few minutes depending on file size...")
     
     try:
-        movies_handler = Movies()
-        result = movies_handler._process_imdb_data()
+        result = Movies._process_imdb_data()
         
         if result:
             print("\n✓ IMDB data processing completed successfully!")

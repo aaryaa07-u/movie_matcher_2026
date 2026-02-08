@@ -21,8 +21,10 @@ def register():
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
         display_Name = request.form.get('displayName')
+        preferred_genres = request.form.getlist('preferred_genres')
         
-        success, message = User.create_user(email, display_Name, password, confirm_password)
+        
+        success, message = User.create_user(email, display_Name, password, confirm_password, preferred_genres)
         
         if success:
             flash(message, 'success')
@@ -31,7 +33,7 @@ def register():
         else:
             flash(message, 'error')
 
-    return render_template("register.html", email=email)
+    return render_template("register.html", genres=Movies.get_cached_genres(), email=email)
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -195,7 +197,6 @@ def search():
     
     return render_template("search.html", 
                          title=title, 
-                         genre=genre, 
                          year=year, 
                          cast=cast, 
                          rating=rating,
