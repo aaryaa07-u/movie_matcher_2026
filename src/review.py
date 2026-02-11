@@ -8,6 +8,12 @@ class Review:
     def save_review(user_email, movie_id, recommendation_score, acting_score,
                     quality_score, rewatch_score, engagement, written_review):
         """Save a review with basic validation and write to JSON."""
+        print("Recommendation score:", recommendation_score)
+        print("acting score:", acting_score)
+        print("quality_score score:", quality_score)
+        print("rewatch_score score:", rewatch_score)
+        print("engagement score:", engagement)
+
 
         review_data = {
             "recommendation_score": recommendation_score,
@@ -15,20 +21,17 @@ class Review:
             "quality_score": quality_score,
             "rewatch_score": rewatch_score,
             "engagement": engagement,
-            #rating 
             "rating": (recommendation_score + acting_score + quality_score + rewatch_score + engagement) / 10,
             "written_review": written_review
         }
-
         
         # Ensure file exists
-        reviews_file = "data/reviews.json"
-        if not os.path.exists(reviews_file):
-            with open(reviews_file, "w") as f:
+        if not os.path.exists(Review.REVIEWS_FILE):
+            with open(Review.REVIEWS_FILE, "w") as f:
                 json.dump({}, f, indent=4)
 
         # Load existing reviews
-        with open(reviews_file, "r") as f:
+        with open(Review.REVIEWS_FILE, "r") as f:
             reviews = json.load(f)
 
         if movie_id not in reviews:
@@ -42,7 +45,7 @@ class Review:
 
 
         # Save back to file
-        with open(reviews_file, "w") as f:
+        with open(Review.REVIEWS_FILE, "w") as f:
             json.dump(reviews, f, indent=4)
 
         return True, "Review submitted successfully."

@@ -8,28 +8,28 @@ class User:
     
     USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
     REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
-    def __init__(self, email, password=None, display_name=None, preferred_genres=None):
+    def __init__(self, email, password=None, displayName=None, preferences=None):
         """Initialize a User instance."""
         print("Initializing User instance with email:", email)
         self.__email = email
         self.__password = password
-        self.__display_name = display_name
-        self.__preferences = UserPreferences()
-        if preferred_genres:
-          self.__preferences.new_user_genre_score(preferred_genres) 
+        self.__displayName = displayName
+        self.__preferences = UserPreferences.from_dict(preferences)
+         
     
 
     def get_email(self):
         """Get the user's email.""" 
         return self.__email
     
-    def get_display_name(self):
+    def get_displayName(self):
         """Get the user's display preferred name."""
-        return self.__display_name
+        return self.__displayName
 
     def get_preferred_genres(self):
         """Get the user's preferred genres."""
-        return self.__preferred_genres
+        return self.__preferences.get_genres() 
+    
 
 
 
@@ -72,13 +72,13 @@ class User:
         return {
             self.__email : {
             "password": self.__password,
-            "displayName": self.__display_name,
+            "displayName": self.__displayName,
             "preferences": self.__preferences.to_dict()
             }
         }
     
     @staticmethod
-    def create_user(email, display_name, password, confirm_password, preferred_genres):
+    def create_user(email, displayName, password, confirm_password, preferences):
         """Register a new user with validation."""
         # Check if email already exists
         if User.email_exists(email):
@@ -96,8 +96,8 @@ class User:
         # Hash password and save user
         users = User.load_users()
         hashed_password = User.__encrypt_password(password, email)
-
-        new_user = User(email, hashed_password, display_name, preferred_genres)
+        preferences = UserPreferences.set_registeration_rating(preferences)
+        new_user = User(email, hashed_password, displayName, preferences)
 
         User.save_users(new_user.to_dict())
         return True, "User registered successfully."
@@ -127,7 +127,7 @@ class User:
         """Get user data by email."""
         users = User.load_users()
         if email in users:
-            return User(email, users[email]['password'], users[email]['displayName'])
+            return User(email, users[email]['password'], users[email]['displayName'], users[email]['preferences'])
     
     def load_user_reviews(self):
         """Load reviews submitted by this user."""

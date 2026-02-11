@@ -10,15 +10,25 @@
 
                 <div class="me-3">
                     <svg xmlns="http://www.w3.org/2000/svg" width="40" height="40" fill="#0d6efd" viewBox="0 0 16 16">
-                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6"/>
-                        <path d="M14 14s-1-4-6-4-6 4-6 4 1 1 6 1 6-1 6-1"/>
+                        <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6" />
+                        <path d="M14 14s-1-4-6-4-6 4-6 4 1 1 6 1 6-1 6-1" />
                     </svg>
                 </div>
 
                 <div class="flex-grow-1">
-                    <h2 class="mb-1">Welcome, {{ user.get_display_name() }}!</h2>
+                    <h2 class="mb-1">Welcome, {{ user.get_displayName() }}!</h2>
                     <p class="mb-2">You have successfully logged in to Movie Matcher.</p>
                 </div>
+
+                <a href="/logout" class="btn btn-danger btn-sm d-flex align-items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="white" class="me-1"
+                        viewBox="0 0 16 16">
+                        <path d="M6 12V4h1v8H6z" />
+                        <path d="M9.5 8l-3-3v2H1v2h5.5v2l3-3z" />
+                    </svg>
+                    Logout
+                </a>
+
 
             </div>
         </div>
@@ -31,9 +41,10 @@
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header d-flex align-items-center">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0d6efd" class="me-2" viewBox="0 0 16 16">
-                        <path d="M11 6a5 5 0 1 1-1.001-2.999A5 5 0 0 1 11 6z"/>
-                        <path d="M10.743 11.743l3.536 3.536-1.414 1.414-3.536-3.536z"/>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="#0d6efd" class="me-2"
+                        viewBox="0 0 16 16">
+                        <path d="M11 6a5 5 0 1 1-1.001-2.999A5 5 0 0 1 11 6z" />
+                        <path d="M10.743 11.743l3.536 3.536-1.414 1.414-3.536-3.536z" />
                     </svg>
                     <h5 class="mb-0">Advanced Search</h5>
                 </div>
@@ -42,10 +53,10 @@
                     <h6 class="mb-2">Popular Genres:</h6>
 
                     {% for genre in genres[:10] %}
-                        <a href="{{ url_for('search', genre=genre) }}"
-                           class="badge bg-dark text-light rounded-pill me-1 mb-1 p-2">
-                            🎬 {{ genre }}
-                        </a>
+                    <a href="{{ url_for('search', genre=genre) }}"
+                        class="badge bg-dark text-light rounded-pill me-1 mb-1 p-2">
+                        🎬 {{ genre }}
+                    </a>
                     {% endfor %}
 
                     <a href="{{ url_for('search') }}" class="btn btn-outline-primary w-100 mt-3">
@@ -55,90 +66,76 @@
             </div>
         </div>
 
+
         <!-- Your Movie Recommendations -->
         <div class="col-md-6">
             <div class="card shadow-sm">
                 <div class="card-header d-flex align-items-center">
                     💡 <h5 class="mb-0 ms-2">Your Movie Recommendations</h5>
                 </div>
+
                 <div class="card-body">
-                    <p>Based on your preferences, here are some movies we think you'll enjoy.</p>
-                    <p class="text-muted">😐 No recommendations available right now.</p>
+
+                    {% if recommendations %}
+                    {% for movie in recommendations %}
+                    {% include "movie.html" %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">No movie recommendations available right now.</p>
+                    {% endif %}
+
                 </div>
             </div>
         </div>
-
     </div>
-<!-- Your Movie Reviews -->
-<div class="row mt-4" >
-    <div class="col-md-6" >
-        <div class="card shadow-sm">
-            <div class="card-header d-flex align-items-center">
-                📄 <h5 class="mb-0 ms-2">Your Movie Reviews</h5>
-            </div>
 
-            <div class="card-body">
+    <!-- Your Movie Reviews -->
+    <div class="row mt-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm">
+                <div class="card-header d-flex align-items-center">
+                    📄 <h5 class="mb-0 ms-2">Your Movie Reviews</h5>
+                </div>
 
-                {% if user_reviews %}
+                <div class="card-body">
+
+                    {% if user_reviews %}
                     {% for r in user_reviews %}
-                        <div class="card mb-3 shadow-sm">
-                            <div class="card-body">
+                    <div class="card mb-3 shadow-sm">
+                        <div class="card-body">
 
-                                <div class="d-flex justify-content-between align-items-center mb-2">
-                                    <h5 class="mb-0">{{ r.movie.title }} ({{ r.movie.year }})</h5>
-                                    <span class="badge bg-primary">{{ r.movie.rating }}/10</span>
-                                </div>
-
-                                <p class="text-muted mb-1">
-                                    <strong>Genres:</strong> {{ r.movie.genres | join(", ") }}
-                                </p>
-
-                                <p class="text-muted mb-1">
-                                    <strong>Runtime:</strong> {{ r.movie.runtime }} min
-                                </p>
-
-                                <hr>
-
-                                <p class="mb-0"><strong>Your Review:</strong></p>
-                                <p class="mb-0">{{ r.written_review }}</p>
-
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <h5 class="mb-0">{{ r.movie.title }} ({{ r.movie.year }})</h5>
+                                <span class="badge bg-primary">{{ r.rating }}/10</span>
                             </div>
+
+                            <p class="text-muted mb-1">
+                                <strong>Genres:</strong> {{ r.movie.genres | join(", ") }}
+                            </p>
+
+                            <p class="text-muted mb-1">
+                                <strong>Runtime:</strong> {{ r.movie.runtime }} min
+                            </p>
+
+                            <hr>
+
+                            <p class="mb-0"><strong>Your Review:</strong></p>
+                            <p class="mb-0">{{ r.written_review }}</p>
+
                         </div>
-                    {% endfor %}
-                {% else %}
-                    <p class="text-muted">You haven't reviewed any movies yet.</p>
-                {% endif %}
-
-            </div>
-        </div>
-    </div>
-</div>
-
-
-    <!-- Recommendations List  -->
-    <div class="row mt-3">
-        <div class="col-md-12">
-            <div class="list-group">
-
-                {% for movie in recommendations %}
-                <a href="{{ movie.link }}" class="list-group-item list-group-item-action" target="_blank">
-                    <div class="d-flex justify-content-between">
-                        <h5 class="mb-1">▶️ {{ movie.title }}</h5>
-                        <small>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="#f5c518" viewBox="0 0 16 16">
-                                <path d="M3.612 15.443 4.566 9.8.672 6.173l5.356-.777L8 0l1.972 5.396 5.356.777-3.894 3.627.954 5.643L8 13.187z"/>
-                            </svg>
-                            {{ movie.rating }}
-                        </small>
                     </div>
-                    <p class="mb-1">{{ movie.description }}</p>
-                </a>
-                
-                {% endfor %}
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-muted">You haven't reviewed any movies yet.</p>
+                    {% endif %}
 
+                </div>
             </div>
         </div>
     </div>
+
+
+
 
 </div>
 

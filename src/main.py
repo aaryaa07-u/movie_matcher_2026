@@ -1,4 +1,4 @@
-from flask import Flask, flash, render_template, request, redirect, url_for, session
+from flask import Flask, flash, render_template, request, redirect, url_for, session, jsonify
 from user import User
 from review import Review
 from movies import Movies
@@ -20,11 +20,12 @@ def register():
         email = request.form.get('email')
         password = request.form.get('password')
         confirm_password = request.form.get('confirm_password')
-        display_Name = request.form.get('displayName')
-        preferred_genres = request.form.getlist('preferred_genres')
+        displayName = request.form.get('displayName')
+        preference = {}
+        preference.genres = request.form.getlist('preferred_genres')
         
         
-        success, message = User.create_user(email, display_Name, password, confirm_password, preferred_genres)
+        success, message = User.create_user(email, displayName, password, confirm_password, preference)
         
         if success:
             flash(message, 'success')
@@ -35,6 +36,7 @@ def register():
 
     return render_template("register.html", genres=Movies.get_cached_genres(), email=email)
 
+# Handles user login by validating credentials and starting a session if authentication succeeds
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -58,16 +60,16 @@ def dashboard():
     user_email = session['user_email']
     user = User.get_user(user_email)
     genres = Movies.get_cached_genres()
-
-    user_reviews = Movies.get_user_reviews(user)
-
+    user_recommendations=Movies.get_recomendations(user)
+    user_reviews = Movies.get_user_reviews(user)    
     return render_template(
         "dashboard.html",
         user=user,
         genres=genres,
-        user_reviews=user_reviews
+        user_reviews=user_reviews,
+        recommendations=user_recommendations
     )
-
+    
 
 @app.route('/logout')
 def logout():
@@ -104,14 +106,11 @@ def reviews():
 
         if success:
             flash(message, 'success')
-            return redirect(url_for('search'))
+            
         else:
             flash(message, 'error')
 
-        
-
-                  
-
+        return redirect(request.referrer)
  
 
 @app.route('/search')

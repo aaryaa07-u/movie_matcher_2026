@@ -8,7 +8,7 @@ from user import User
 class Movies:
     """FileDB class for handling file-based database operations."""
     MOVIES_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'movies.json') 
-
+    RECOMMENDATION_LIMIT = 5
     # Cache for expensive operations
     _movies_cache = None
     _genres_cache = None
@@ -348,22 +348,30 @@ class Movies:
             if movie.id == movie_id:
                 return movie
         return None
-
+        
     
     def get_reviews(self):
             """Get reviews for this movie."""
             movie_reviews = Review.get_reviews_for_movie(self.id)
             reviews = []
 
-            print("Reviews for movie ID:", self.id, movie_reviews.items())
             for user_email, review in movie_reviews.items():
-                preffered_name = User.get_user(user_email).get_display_name()
-
-                review["user_display_name"] = preffered_name
-                reviews.append(review)
-            print(reviews)
+                user = User.get_user(user_email);
+                if user is not None:
+                    preferred_name = User.get_user(user_email).get_displayName()
+                    review["user_displayName"] = preferred_name
+                    reviews.append(review)
 
             return reviews
+    
+    def get_recomendations(user):
+        recommendations = []
+        for genre in user.get_preferred_genres() :
+            movies = Movies.search_movies_by_genre(genre)
+            sorted_movies = sorted(movies, key=lambda m: m.rating, reverse=True)
+            recommendations.extend(sorted_movies[:Movies.RECOMMENDATION_LIMIT])
+        return recommendations
+        
  
     #To display the user's own reviews on the dashboard
     def get_user_reviews(user):
@@ -383,6 +391,7 @@ class Movies:
                 'quality_score': review['quality_score'],
                 'rewatch_score': review['rewatch_score'],
                 'engagement': review['engagement'],
+                'rating': review['rating'],
                     'written_review': review['written_review']
                 })
         return reviews

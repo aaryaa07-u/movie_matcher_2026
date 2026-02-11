@@ -25,8 +25,9 @@
                 <input type="email" class="form-control" id="email" name="email" value="{{ email }}" required>
             </div>
 
-            <div class="mb-3">
-                <label for="displayName" class="form-label">Prefferred name</label>
+            <!-- Creating a preferred name card, the user can input-->
+            <div class="mb-3"> 
+                <label for="displayName" class="form-label">Preferred name</label>
                 <input type="text" class="form-control" id="displayName" name="displayName" value="{{ displayName }}"
                     required>
             </div>
@@ -42,6 +43,7 @@
                 <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
             </div>
 
+            <!--User can select their favourite genres-->
             <div class="mb-3">
                 <label for="preferred_genres" class="form-label">Preferred genres:</label>
                 {% for genre in genres[:10] %}
