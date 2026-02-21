@@ -18,7 +18,7 @@ class UserPreferences:
     def set_registeration_rating(data):
         """Create a UserPreferences instance from a dictionary."""
         preference = UserPreferences()
-        for genre in data.genres:
+        for genre in data.get('genres'):
             preference.genre[genre] = UserPreferences.REGISTRATION_GENRE_SCORE           
         return preference.to_dict()
     

@@ -6,6 +6,7 @@ from review import Review
 from user import User
 
 class Movies:
+    temp_status = None
     """FileDB class for handling file-based database operations."""
     MOVIES_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'movies.json') 
     RECOMMENDATION_LIMIT = 5
@@ -29,9 +30,6 @@ class Movies:
         self.rating = rating
         self.votes = votes
          
-        
-
-
     @staticmethod
     def from_json(movie_id, data):
         return Movies(
@@ -44,7 +42,6 @@ class Movies:
             votes=data.get("votes")
         )
 
-    
     def to_json(self):
         return {
             "id": self.id,
@@ -56,8 +53,6 @@ class Movies:
             "votes": self.votes
         }
     
-    
-
     @staticmethod
     def get_cached_movies():
         """Get movies with caching."""
@@ -372,8 +367,20 @@ class Movies:
             recommendations.extend(sorted_movies[:Movies.RECOMMENDATION_LIMIT])
         return recommendations
         
+    def get_user_review(self, user):
+        user_reviews = user.load_user_reviews()
+        if (user_reviews != None) :
+            return user_reviews.get(self.id)
+        return None
+    
+    def delete_user_review(self, user):
+        user_reviews = user.load_user_reviews()
+        if (user_reviews != None) :
+            user_reviews.pop(self.id, None)
+        print(user_reviews)
  
     #To display the user's own reviews on the dashboard
+    @staticmethod
     def get_user_reviews(user):
 
         # Load reviews.json

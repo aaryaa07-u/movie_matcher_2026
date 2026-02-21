@@ -2,12 +2,13 @@ import json
 import os
 from user_preferences import UserPreferences
 
-
 class User:
     """User class for authentication and registration management."""
     
     USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
     REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
+    _user_review_cache = None
+    _users_cache = None
     def __init__(self, email, password=None, displayName=None, preferences=None):
         """Initialize a User instance."""
         print("Initializing User instance with email:", email)
@@ -16,8 +17,6 @@ class User:
         self.__displayName = displayName
         self.__preferences = UserPreferences.from_dict(preferences)
          
-    
-
     def get_email(self):
         """Get the user's email.""" 
         return self.__email
@@ -30,9 +29,6 @@ class User:
         """Get the user's preferred genres."""
         return self.__preferences.get_genres() 
     
-
-
-
     @staticmethod
     def validate_password(password):
         """Validate password strength."""
@@ -48,10 +44,18 @@ class User:
     
     @staticmethod
     def load_users():
+        if (User._users_cache == None):
+            User.load_users_from_disk()
+        return User._users_cache
+        
+        
+
+    @staticmethod
+    def load_users_from_disk():   
         """Load all users from the JSON file."""
         if os.path.exists(User.USERS_FILE):
             with open(User.USERS_FILE, 'r') as f:
-                return json.load(f)
+                User._users_cache = json.load(f)
         return {}
     
     @staticmethod
@@ -98,15 +102,17 @@ class User:
         hashed_password = User.__encrypt_password(password, email)
         preferences = UserPreferences.set_registeration_rating(preferences)
         new_user = User(email, hashed_password, displayName, preferences)
-
-        User.save_users(new_user.to_dict())
+        # Merge the inner user review(s) 
+        for user_email, record in new_user.to_dict().items(): 
+            users[email] = record
+        User.save_users(users)
         return True, "User registered successfully."
     
     @staticmethod
     def authenticate_user(email, password):
         """Authenticate a user by email and password."""
         users = User.load_users()
-
+        User._user_review_cache = None
         
         if email not in users:
             return False, "Invalid username/password."
@@ -131,6 +137,12 @@ class User:
     
     def load_user_reviews(self):
         """Load reviews submitted by this user."""
+        if User._user_review_cache is None:
+            print("Loading user reviews from disk...")
+            self.load_reviews_from_disk()
+        return User._user_review_cache
+
+    def load_reviews_from_disk(self):
         if os.path.exists(User.REVIEWS_FILE):
             with open(User.REVIEWS_FILE, 'r') as f:
                 reviews = json.load(f)
@@ -138,9 +150,17 @@ class User:
                 for movie_id, movie_reviews in reviews.items():
                     if self.__email in movie_reviews:
                         user_reviews[movie_id] = movie_reviews[self.__email]
-                return user_reviews
-        return {}
+                User._user_review_cache = user_reviews
 
+
+
+    def delete_movie_review(self, movie_id): 
+        User._user_review_cache.pop(movie_id, None)
+
+
+
+        
+        
     #creating my own hash function
     def __encrypt_password(password: str, email : str) -> str:
             data = (email + password + "moviematcher07").encode("utf-8")

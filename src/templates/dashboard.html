@@ -101,7 +101,7 @@
 
                     {% if user_reviews %}
                     {% for r in user_reviews %}
-                    <div class="card mb-3 shadow-sm">
+                    <div id="review-{{ r.movie.id }}" class="card mb-3 shadow-sm">
                         <div class="card-body">
 
                             <div class="d-flex justify-content-between align-items-center mb-2">
@@ -121,6 +121,14 @@
 
                             <p class="mb-0"><strong>Your Review:</strong></p>
                             <p class="mb-0">{{ r.written_review }}</p>
+
+                        </div>
+                        <div class="card-footer"
+                            style="display: flex; justify-content: flex-end; gap: 4px ;background-color: transparent; border-top: none;">
+                            <button class="btn btn-sm btn-danger mt-2" data-bs-toggle="modal"
+                                data-bs-target="#confirmDeleteModal" onclick="setDeleteData('{{ r.movie.id }}')">
+                                Delete Review
+                            </button>
 
                         </div>
                     </div>

@@ -22,7 +22,8 @@
                         <div class="card-footer"
                             style="display: flex; justify-content: flex-end; gap: 4px ;background-color: transparent; border-top: none;">
                             <button onclick='writeReview({{movie.to_json() | tojson | safe}})'
-                                class="btn btn-sm btn-primary mt-2">
+                                class="btn btn-sm btn-primary mt-2"
+                                {{'disabled' if movie.temp_status != None else ''}}>
                                 Leave your Review
                             </button>
                             <button onclick='readReviews({{movie.to_json() | tojson | safe}},

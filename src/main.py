@@ -22,8 +22,7 @@ def register():
         confirm_password = request.form.get('confirm_password')
         displayName = request.form.get('displayName')
         preference = {}
-        preference.genres = request.form.getlist('preferred_genres')
-        
+        preference['genres'] = request.form.getlist('preferred_genres')
         
         success, message = User.create_user(email, displayName, password, confirm_password, preference)
         
@@ -54,11 +53,39 @@ def login():
     
     return render_template("login.html")
 
+@app.route('/delete_review/<movie_id>', methods=['POST'])
+@login_required
+def delete_review(movie_id):
+    # Retrieve the logged‑in user's email from the session
+    user_email = session['user_email']
+
+    # Load the user object so their personal review list can be updated
+    user = User.get_user(user_email)
+
+    # Remove the movie from the user's saved review list (dashboard)
+    user.delete_movie_review(movie_id)
+
+    # Load all reviews stored in reviews.json
+    reviews = Review.load_cached_reviews()
+    print(reviews)
+
+    # Delete only this user's review for the specified movie
+    del reviews[movie_id][user_email]
+
+    # Save the updated reviews dictionary back to reviews.json
+    Review.dump_reviews(reviews)
+
+    # Return a 200 OK response to indicate successful deletion
+    return '', 200
+
+
 @app.route('/dashboard')
 @login_required
 def dashboard():
     user_email = session['user_email']
     user = User.get_user(user_email)
+    print(user)
+    print(user_email)
     genres = Movies.get_cached_genres()
     user_recommendations=Movies.get_recomendations(user)
     user_reviews = Movies.get_user_reviews(user)    
@@ -133,7 +160,8 @@ def search():
     # Limit results to 500 for performance
     MAX_RESULTS = 50
 
-    
+    user_email = session['user_email']
+    user = User.get_user(user_email)
     # Filter movies based on all parameters
     for movie in movies:
         try:
@@ -169,7 +197,7 @@ def search():
             if cast and 'cast' in movie:
                 if cast not in movie.cast.lower():
                     continue
-            
+            movie.temp_status = movie.get_user_review(user)
             # Movie passed all filters
             results.append(movie)
         except Exception as e:
