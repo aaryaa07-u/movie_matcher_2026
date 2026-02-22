@@ -63,11 +63,10 @@ def delete_review(movie_id):
     user = User.get_user(user_email)
 
     # Remove the movie from the user's saved review list (dashboard)
-    user.delete_movie_review(movie_id)
+    Review.delete_movie_review(movie_id)
 
     # Load all reviews stored in reviews.json
     reviews = Review.load_cached_reviews()
-    print(reviews)
 
     # Delete only this user's review for the specified movie
     del reviews[movie_id][user_email]
@@ -84,8 +83,6 @@ def delete_review(movie_id):
 def dashboard():
     user_email = session['user_email']
     user = User.get_user(user_email)
-    print(user)
-    print(user_email)
     genres = Movies.get_cached_genres()
     user_recommendations=Movies.get_recomendations(user)
     user_reviews = Movies.get_user_reviews(user)    
@@ -119,10 +116,11 @@ def reviews():
         engagement_score = int(request.form.get('engagement'))
         written_review = request.form.get('reviewText')
 
+        movie = Movies.get_movie_by_id(movie_id)
         # Save review
         success, message = Review.save_review(
             user_email=session['user_email'],
-            movie_id=movie_id,
+            movie=movie,
             recommendation_score=recommendation_score,
             acting_score=acting_score,
             quality_score=quality_score,

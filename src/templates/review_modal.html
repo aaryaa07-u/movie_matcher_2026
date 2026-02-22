@@ -13,25 +13,29 @@
                 <input type="hidden" name="movieId" id="movieId">
                 <div class="modal-body">
                     <input type="hidden" id="calculatedRating" name="rating">
-                   
+
                     <div class="mb-3">
                         <label class="form-label"><strong>Movie:</strong> <span id="movieTitle"></span></label>
                     </div>
-                   
+
                     <!-- Question 1: Recommendation -->
                     <div class="mb-4">
-                        <label class="form-label"><strong>1. Would you recommend this movie to a friend?</strong></label>
+                        <label class="form-label"><strong>1. Would you recommend this movie to a
+                                friend?</strong></label>
                         <div class="mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="recommend" id="recommend5" value="20" checked>
+                                <input class="form-check-input" type="radio" name="recommend" id="recommend5" value="20"
+                                    checked>
                                 <label class="form-check-label" for="recommend5">Absolutely! Must watch</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="recommend" id="recommend4" value="16">
+                                <input class="form-check-input" type="radio" name="recommend" id="recommend4"
+                                    value="16">
                                 <label class="form-check-label" for="recommend4">Yes, definitely</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="recommend" id="recommend3" value="12">
+                                <input class="form-check-input" type="radio" name="recommend" id="recommend3"
+                                    value="12">
                                 <label class="form-check-label" for="recommend3">Maybe, depends on their taste</label>
                             </div>
                             <div class="form-check">
@@ -44,13 +48,14 @@
                             </div>
                         </div>
                     </div>
-                   
+
                     <!-- Question 2: Rewatchability -->
                     <div class="mb-4">
                         <label class="form-label"><strong>2. Would you watch this movie again?</strong></label>
                         <div class="mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="rewatch" id="rewatch5" value="20" checked>
+                                <input class="form-check-input" type="radio" name="rewatch" id="rewatch5" value="20"
+                                    checked>
                                 <label class="form-check-label" for="rewatch5">Yes, multiple times</label>
                             </div>
                             <div class="form-check">
@@ -71,13 +76,15 @@
                             </div>
                         </div>
                     </div>
-                   
+
                     <!-- Question 3: Acting -->
                     <div class="mb-4">
-                        <label class="form-label"><strong>3. How would you rate the acting performances?</strong></label>
+                        <label class="form-label"><strong>3. How would you rate the acting
+                                performances?</strong></label>
                         <div class="mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="acting" id="acting5" value="20" checked>
+                                <input class="form-check-input" type="radio" name="acting" id="acting5" value="20"
+                                    checked>
                                 <label class="form-check-label" for="acting5">Outstanding performances</label>
                             </div>
                             <div class="form-check">
@@ -98,40 +105,47 @@
                             </div>
                         </div>
                     </div>
-                   
+
                     <!-- Question 4: Engagement -->
                     <div class="mb-4">
                         <label class="form-label"><strong>4. How engaging was the movie?</strong></label>
                         <div class="mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="engagement" id="engagement5" value="20" checked>
+                                <input class="form-check-input" type="radio" name="engagement" id="engagement5"
+                                    value="20" checked>
                                 <label class="form-check-label" for="engagement5">Completely captivating</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="engagement" id="engagement4" value="16">
+                                <input class="form-check-input" type="radio" name="engagement" id="engagement4"
+                                    value="16">
                                 <label class="form-check-label" for="engagement4">Very engaging</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="engagement" id="engagement3" value="12">
+                                <input class="form-check-input" type="radio" name="engagement" id="engagement3"
+                                    value="12">
                                 <label class="form-check-label" for="engagement3">Moderately interesting</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="engagement" id="engagement2" value="8">
+                                <input class="form-check-input" type="radio" name="engagement" id="engagement2"
+                                    value="8">
                                 <label class="form-check-label" for="engagement2">Somewhat boring</label>
                             </div>
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="engagement" id="engagement1" value="4">
+                                <input class="form-check-input" type="radio" name="engagement" id="engagement1"
+                                    value="4">
                                 <label class="form-check-label" for="engagement1">Very boring</label>
                             </div>
                         </div>
                     </div>
-                   
+
                     <!-- Question 5: Overall Quality -->
                     <div class="mb-4">
-                        <label class="form-label"><strong>5. How would you rate the overall production quality?</strong></label>
+                        <label class="form-label"><strong>5. How would you rate the overall production
+                                quality?</strong></label>
                         <div class="mt-2">
                             <div class="form-check">
-                                <input class="form-check-input" type="radio" name="quality" id="quality5" value="20" checked>
+                                <input class="form-check-input" type="radio" name="quality" id="quality5" value="20"
+                                    checked>
                                 <label class="form-check-label" for="quality5">Excellent production</label>
                             </div>
                             <div class="form-check">
@@ -152,12 +166,12 @@
                             </div>
                         </div>
                     </div>
-                                     
+
                     <!-- Written Review -->
                     <div class="mb-3">
                         <label for="reviewText" class="form-label"><strong>Write your review </strong></label>
                         <textarea class="form-control" id="reviewText" name="reviewText" rows="3"
-                                  placeholder="Share any additional thoughts about this movie..." required></textarea>
+                            placeholder="Share any additional thoughts about this movie..." required></textarea>
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -168,5 +182,5 @@
         </div>
     </div>
 </div>
- 
+
 </html>

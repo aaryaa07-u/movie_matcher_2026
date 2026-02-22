@@ -21,7 +21,7 @@ class Movies:
     os.makedirs(__data_dir, exist_ok=True)
     os.makedirs(__imdb_dir, exist_ok=True)   
 
-    def __init__(self, movie_id, title, year, genres, runtime, rating, votes):
+    def __init__(self, movie_id, title, year, genres, runtime, rating, votes, cast, directors):
         self.id = movie_id
         self.title = title
         self.year = year
@@ -29,9 +29,17 @@ class Movies:
         self.runtime = runtime
         self.rating = rating
         self.votes = votes
-         
+        self.cast = cast
+        self.directors = directors
+        
+
+
     @staticmethod
     def from_json(movie_id, data):
+        all_cast = data.get("cast")
+        acting_cast = all_cast["actor"] + all_cast["actress"]
+        
+
         return Movies(
             movie_id=movie_id,
             title=data.get("title"),
@@ -39,7 +47,9 @@ class Movies:
             genres=data.get("genres"),
             runtime=data.get("runtime"),
             rating=data.get("rating"),
-            votes=data.get("votes")
+            votes=data.get("votes"),
+            cast= acting_cast,
+            directors=all_cast["director"]
         )
 
     def to_json(self):
@@ -298,7 +308,7 @@ class Movies:
     @staticmethod
     def get_genres():
         """Extract and return all unique genres from movies."""
-        movies = Movies.get_all_movies()
+        movies = Movies.get_cached_movies()
         genres_set = set()
         
         for movie in movies:
@@ -312,7 +322,7 @@ class Movies:
     @staticmethod
     def search_movies_by_genre(genre):
         """Get movies that belong to a specific genre."""
-        movies = Movies.get_all_movies()
+        movies = Movies.get_cached_movies()
         genre_movies = []
         
         for movie in movies:
@@ -322,17 +332,36 @@ class Movies:
         return genre_movies
     
     @staticmethod
+    def search_movies_by_cast(cast):
+        """Get movies that belong to a specific genre."""
+        movies = Movies.get_cached_movies()
+        result = []
+        
+        for movie in movies:
+            if movie.cast and cast in movie.cast:
+                result.append(movie)
+        
+        return result
+    
+    @staticmethod
     def get_all_movies():
+        # Check if the movies JSON file exists
         if os.path.exists(Movies.MOVIES_FILE):
+
+            # Open the JSON file and load its contents into memory
             with open(Movies.MOVIES_FILE, 'r', encoding='utf-8') as f:
                 data = json.load(f)
 
             movies = []
+
+            # Convert each JSON entry into a Movie object
             for movie_id, movie_data in data.items():
                 movies.append(Movies.from_json(movie_id, movie_data))
 
+            # Return the full list of Movie objects
             return movies
 
+        # If the file does not exist, return an empty list
         return []
     
     @staticmethod
@@ -368,13 +397,13 @@ class Movies:
         return recommendations
         
     def get_user_review(self, user):
-        user_reviews = user.load_user_reviews()
+        user_reviews = Review.load_user_reviews(user)
         if (user_reviews != None) :
             return user_reviews.get(self.id)
         return None
     
     def delete_user_review(self, user):
-        user_reviews = user.load_user_reviews()
+        user_reviews = Review.load_user_reviews(user)
         if (user_reviews != None) :
             user_reviews.pop(self.id, None)
         print(user_reviews)
@@ -384,7 +413,9 @@ class Movies:
     def get_user_reviews(user):
 
         # Load reviews.json
-        user_reviews = user.load_user_reviews()
+        user_reviews = Review.load_user_reviews(user)
+        print("usrReviews")
+        print(user_reviews)
         # Load movies
         reviews = []
 

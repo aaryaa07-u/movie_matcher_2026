@@ -7,11 +7,10 @@ class User:
     
     USERS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'users.json')
     REVIEWS_FILE = os.path.join(os.path.dirname(__file__), '..', 'data', 'reviews.json')
-    _user_review_cache = None
+ 
     _users_cache = None
     def __init__(self, email, password=None, displayName=None, preferences=None):
         """Initialize a User instance."""
-        print("Initializing User instance with email:", email)
         self.__email = email
         self.__password = password
         self.__displayName = displayName
@@ -28,7 +27,13 @@ class User:
     def get_preferred_genres(self):
         """Get the user's preferred genres."""
         return self.__preferences.get_genres() 
-    
+    def get_preferred_cast(self):
+        return self.__preferences.get_cast()
+
+    def get_preferences(self):
+        return self.__preferences
+    def set_preferences(self, preferences):
+        self.__preferences = preferences
     @staticmethod
     def validate_password(password):
         """Validate password strength."""
@@ -53,22 +58,31 @@ class User:
     @staticmethod
     def load_users_from_disk():   
         """Load all users from the JSON file."""
-        if os.path.exists(User.USERS_FILE):
-            with open(User.USERS_FILE, 'r') as f:
+        if not os.path.exists(User.USERS_FILE):
+            with open(User.USERS_FILE, "w") as f:
+                json.dump({}, f, indent=4)
+        with open(User.USERS_FILE, 'r') as f:
                 User._users_cache = json.load(f)
-        return {}
+        return User._users_cache
+    
     
     @staticmethod
-    def save_users(users_dict):
+    def save_user(user):
         """Save users to the JSON file."""
+        users = User.load_users()
+        for user_email, record in user.to_dict().items(): 
+            users[user_email] = record
+        
         os.makedirs(os.path.dirname(User.USERS_FILE), exist_ok=True)
         with open(User.USERS_FILE, 'w') as f:
-            json.dump(users_dict, f, indent=4)
+            json.dump(users, f, indent=4)
     
     @staticmethod
     def email_exists(email):
         """Check if an email is already registered."""
         users = User.load_users()
+        if (users == None) :
+            return None
         return email in users
     
     def to_dict(self):
@@ -98,21 +112,17 @@ class User:
             return False, message
         
         # Hash password and save user
-        users = User.load_users()
         hashed_password = User.__encrypt_password(password, email)
         preferences = UserPreferences.set_registeration_rating(preferences)
         new_user = User(email, hashed_password, displayName, preferences)
-        # Merge the inner user review(s) 
-        for user_email, record in new_user.to_dict().items(): 
-            users[email] = record
-        User.save_users(users)
+        
+        User.save_user(new_user)
         return True, "User registered successfully."
     
     @staticmethod
     def authenticate_user(email, password):
         """Authenticate a user by email and password."""
         users = User.load_users()
-        User._user_review_cache = None
         
         if email not in users:
             return False, "Invalid username/password."
@@ -135,31 +145,27 @@ class User:
         if email in users:
             return User(email, users[email]['password'], users[email]['displayName'], users[email]['preferences'])
     
-    def load_user_reviews(self):
-        """Load reviews submitted by this user."""
-        if User._user_review_cache is None:
-            print("Loading user reviews from disk...")
-            self.load_reviews_from_disk()
-        return User._user_review_cache
+    
 
     def load_reviews_from_disk(self):
+    # Check if the reviews file exists before trying to read it
         if os.path.exists(User.REVIEWS_FILE):
+
+            # Open the JSON file and load all stored reviews
             with open(User.REVIEWS_FILE, 'r') as f:
                 reviews = json.load(f)
-                user_reviews = {}
-                for movie_id, movie_reviews in reviews.items():
-                    if self.__email in movie_reviews:
-                        user_reviews[movie_id] = movie_reviews[self.__email]
-                User._user_review_cache = user_reviews
+
+                # Dictionary to store only the reviews belonging to this user
+                
 
 
 
-    def delete_movie_review(self, movie_id): 
-        User._user_review_cache.pop(movie_id, None)
+
+  
 
 
 
-        
+
         
     #creating my own hash function
     def __encrypt_password(password: str, email : str) -> str:
