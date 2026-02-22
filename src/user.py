@@ -124,19 +124,16 @@ class User:
         """Authenticate a user by email and password."""
         users = User.load_users()
         
-        if email not in users:
-            return False, "Invalid username/password."
-        
-        stored_password_hash = users[email]['password']
-        print("Stored password hash:", stored_password_hash)
-        
-        encrypted_password = User.__encrypt_password(password, email)
-        print("Encrypted password:", encrypted_password)
+        if email in users:
+            stored_password_hash = users[email]['password']
+            print("Stored password hash:", stored_password_hash)
+            
+            encrypted_password = User.__encrypt_password(password, email)
+            print("Encrypted password:", encrypted_password)
 
-        if encrypted_password == stored_password_hash:
-            return True, "Login successful."
-        else:
-            return False, "Invalid username/password."
+            if encrypted_password == stored_password_hash:
+                return User.get_user(email), "Login successful."
+        return False, "Invalid username/password."
     
     @staticmethod
     def get_user(email):
@@ -146,27 +143,6 @@ class User:
             return User(email, users[email]['password'], users[email]['displayName'], users[email]['preferences'])
     
     
-
-    def load_reviews_from_disk(self):
-    # Check if the reviews file exists before trying to read it
-        if os.path.exists(User.REVIEWS_FILE):
-
-            # Open the JSON file and load all stored reviews
-            with open(User.REVIEWS_FILE, 'r') as f:
-                reviews = json.load(f)
-
-                # Dictionary to store only the reviews belonging to this user
-                
-
-
-
-
-  
-
-
-
-
-        
     #creating my own hash function
     def __encrypt_password(password: str, email : str) -> str:
             data = (email + password + "moviematcher07").encode("utf-8")

@@ -42,10 +42,11 @@ def login():
         email = request.form.get('email')
         password = request.form.get('password')
         
-        success, message = User.authenticate_user(email, password)
+        user, message = User.authenticate_user(email, password)
         
-        if success:
+        if user != None:
             session['user_email'] = email
+            Review.load_user_cache(user)
             flash(message, 'success')
             return redirect(url_for('dashboard'))
         else:
@@ -73,6 +74,8 @@ def delete_review(movie_id):
 
     # Save the updated reviews dictionary back to reviews.json
     Review.dump_reviews(reviews)
+    Review.load_user_cache(user)
+
 
     # Return a 200 OK response to indicate successful deletion
     return '', 200
@@ -85,6 +88,7 @@ def dashboard():
     user = User.get_user(user_email)
     genres = Movies.get_cached_genres()
     user_recommendations=Movies.get_recomendations(user)
+
     user_reviews = Movies.get_user_reviews(user)    
     return render_template(
         "dashboard.html",
@@ -192,9 +196,9 @@ def search():
                     pass
             
             # Cast filter (if available)
-            if cast and 'cast' in movie:
-                if cast not in movie.cast.lower():
-                    continue
+            if not any(cast.lower() in crew.lower() for crew in movie.cast):
+                continue
+            
             movie.temp_status = movie.get_user_review(user)
             # Movie passed all filters
             results.append(movie)

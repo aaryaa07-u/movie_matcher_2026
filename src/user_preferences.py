@@ -43,10 +43,10 @@ class UserPreferences:
 
     
     def get_genres(self):
-        return sorted(self.genre, key=self.genre.get, reverse=True)
+        return sorted(self.genre, key=self.genre.get, reverse=True)[:5]
     
     def get_cast(self):
-        return sorted(self.cast, key= self.cast.get, reverse = True )
+        return sorted(self.cast, key= self.cast.get, reverse = True )[:5]
     
     
     

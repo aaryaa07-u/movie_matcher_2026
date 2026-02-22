@@ -55,7 +55,7 @@ class Review:
         Review.dump_reviews(reviews)
 
         # Refresh the user's review list so the dashboard updates immediately
-        user.load_reviews_from_disk()
+        Review.load_user_cache(user)
 
         # Return success status and confirmation message
         return True, "Review submitted successfully."
@@ -66,17 +66,11 @@ class Review:
     def dump_reviews(reviews):
         # Open the reviews.json file in write mode so the updated
         # reviews dictionary can be saved to persistent storage.
-        print("in dumo reviews")
-        print(reviews)
+        
         with open(Review.REVIEWS_FILE, "w") as f:
             # Convert the Python dictionary into JSON and write it
             # to the file with indentation for readability.
             json.dump(reviews, f, indent=4)
-
-        # Output the current state of the reviews to the console
-        # for debugging and verification during development.
-
-        
 
 
     @staticmethod
@@ -102,19 +96,20 @@ class Review:
     def load_user_reviews(user):
         """Load reviews submitted by this user."""
         if Review._user_review_cache is None:
-            Review.load_reviews()
-            user_reviews = {}
-
-            # Loop through every movie and its associated reviews
-            for movie_id, movie_reviews in Review._cache.items():
-                # If this user has written a review for the movie, store it
-                if user.get_email() in movie_reviews:
-                    user_reviews[movie_id] = movie_reviews[user.get_email()]
-
-            # Cache the user's reviews so they can be accessed quickly later
-            Review._user_review_cache = user_reviews
+            Review.load_user_cache(user)
         return Review._user_review_cache
-    
+    @staticmethod
+    def load_user_cache(user):
+        Review.load_reviews()
+        user_reviews = {}
+        # Loop through every movie and its associated reviews
+        for movie_id, movie_reviews in Review._cache.items():
+            # If this user has written a review for the movie, store it
+            if user.get_email() in movie_reviews:
+                user_reviews[movie_id] = movie_reviews[user.get_email()]
+
+        # Cache the user's reviews so they can be accessed quickly later
+        Review._user_review_cache = user_reviews
     @staticmethod
     def load_reviews():
     # Ensure file exists

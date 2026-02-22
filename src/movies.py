@@ -118,8 +118,6 @@ class Movies:
                     except (ValueError, KeyError):
                         continue
             
-            print(f"  Total ratings: {total_ratings}")
-            print(f"  After numVotes>=1000 filter: {len(df_ratings)}")
             
             # Create set of movie IDs with good ratings for faster lookup
             rated_movie_ids = set(df_ratings.keys())
@@ -394,7 +392,17 @@ class Movies:
             movies = Movies.search_movies_by_genre(genre)
             sorted_movies = sorted(movies, key=lambda m: m.rating, reverse=True)
             recommendations.extend(sorted_movies[:Movies.RECOMMENDATION_LIMIT])
-        return recommendations
+        
+        for crew in user.get_preferred_cast() :
+            movies = Movies.search_movies_by_cast(crew)
+            sorted_movies = sorted(movies, key=lambda m: m.rating, reverse=True)
+            recommendations.extend(sorted_movies[:Movies.RECOMMENDATION_LIMIT])    
+
+        unique = sorted(list({movie.id: movie for movie in recommendations}.values()),  key=lambda m: m.rating, reverse=True)[:Movies.RECOMMENDATION_LIMIT]  
+        for movie in unique:
+            movie.temp_status = movie.get_user_review(user)
+
+        return unique
         
     def get_user_review(self, user):
         user_reviews = Review.load_user_reviews(user)
@@ -406,7 +414,6 @@ class Movies:
         user_reviews = Review.load_user_reviews(user)
         if (user_reviews != None) :
             user_reviews.pop(self.id, None)
-        print(user_reviews)
  
     #To display the user's own reviews on the dashboard
     @staticmethod
@@ -414,8 +421,6 @@ class Movies:
 
         # Load reviews.json
         user_reviews = Review.load_user_reviews(user)
-        print("usrReviews")
-        print(user_reviews)
         # Load movies
         reviews = []
 
